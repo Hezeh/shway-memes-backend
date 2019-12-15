@@ -1,0 +1,27 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+django = "==2.2.6"
+djangorestframework = "*"
+django-cors-headers = "*"
+django-rest-auth = {extras = ["with_social"],version = "*"}
+django-environ = "*"
+django-storages = "*"
+gunicorn = "*"
+django-redis = "*"
+django-rest-swagger = "*"
+psycopg2-binary = "*"
+django-admin-interface = "*"
+celery = "*"
+django-versatileimagefield = "*"
+six = "*"
+pyjwt = "*"
+uwsgi = "*"
+
+[requires]
+python_version = "3.7"
