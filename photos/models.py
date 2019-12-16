@@ -1,8 +1,8 @@
 from django.db import models
 from django.db.models import signals
-from versatileimagefield.fields import PPOIField, VersatileImageField
-from versatileimagefield.image_warmer import VersatileImageFieldWarmer
-from django.dispatch import receiver
+# from versatileimagefield.fields import PPOIField, VersatileImageField
+# from versatileimagefield.image_warmer import VersatileImageFieldWarmer
+# from django.dispatch import receiver
 import uuid
 from django.db import models
 from users.models import User
@@ -26,14 +26,19 @@ class Tag(BaseModel):
     def __str__(self):
         return self.tag
 
-class Meme(BaseModel):
+class Meme(models.Model):
     """ 
     Every meme must have an author. 
     This gives permissions tho who gets credit for posting the
     meme and who can delete it .A Profile can have many memes"""
+    id = models.UUIDField(
+        primary_key=True,
+        editable=False,
+        default=uuid.uuid4,
+    )
     author = models.ForeignKey('profiles.Profile', on_delete=models.CASCADE)
-    image = VersatileImageField(upload_to='meme', ppoi_field="ppoi", blank=False)
-    ppoi = PPOIField()
+    photo = models.ImageField(upload_to='memes', blank=False)
+    # ppoi = PPOIField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField('photos.Tag', related_name='memes', blank=True)
 
@@ -86,15 +91,15 @@ class Meme(BaseModel):
         verbose_name = 'Meme'
         verbose_name_plural = 'Memes'
 
-@receiver(models.signals.post_save, sender=Meme)
-def warm_Meme_images(sender, instance, **kwargs):
-    "Ensures Meme images are created post-save"
-    person_img_warmer = VersatileImageFieldWarmer(
-        instance_or_queryset=instance,
-        rendition_key_set='meme_shot',
-        #image_attr='meme_shot'
-    )
-    num_created, failed_to_create = person_img_warmer.warm()
+# @receiver(models.signals.post_save, sender=Meme)
+# def warm_Meme_images(sender, instance, **kwargs):
+#     "Ensures Meme images are created post-save"
+#     person_img_warmer = VersatileImageFieldWarmer(
+#         instance_or_queryset=instance,
+#         rendition_key_set='meme_shot',
+#         #image_attr='meme_shot'
+#     )
+#     num_created, failed_to_create = person_img_warmer.warm()
 
 
 
