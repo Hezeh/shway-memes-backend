@@ -12,7 +12,6 @@ django-cors-headers = "*"
 django-rest-auth = {extras = ["with_social"],version = "*"}
 django-environ = "*"
 django-storages = "*"
-gunicorn = "*"
 django-redis = "*"
 django-rest-swagger = "*"
 psycopg2-binary = "*"
@@ -21,7 +20,7 @@ celery = "*"
 django-versatileimagefield = "*"
 six = "*"
 pyjwt = "*"
-uwsgi = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
