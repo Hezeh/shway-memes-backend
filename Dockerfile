@@ -5,26 +5,21 @@ FROM python:3.8.0-buster
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# create root directory for our project in the container
-RUN mkdir /usr/src/app
-
 # Set the working directory to /data
-WORKDIR /usr/src/app
-
-# Copy the current directory contents into the container
-ADD . /usr/src/app
+WORKDIR /code
 
 # Install dependencies
 RUN pip install --upgrade pip
 RUN pip install pipenv
-COPY Pipfile Pipfile.lock /usr/src/app/
+COPY Pipfile Pipfile.lock /code/
 RUN pipenv install --skip-lock --system --dev
+#RUN pipenv shell
 
 # copy entrypoint.sh
-COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
+COPY ./entrypoint.sh /code/entrypoint.sh
 
 # Copy project
-COPY . /usr/src/app/
+COPY . /code/
 
 # run entrypoint.sh
-ENTRYPOINT [ "/usr/src/app/entrypoint.sh" ]
+ENTRYPOINT [ "/code/entrypoint.sh" ]
