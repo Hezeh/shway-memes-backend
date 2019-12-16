@@ -4,11 +4,12 @@ services:
   web:
     build: .
     #command: python /usr/src/django-memes/manage.py runserver 0.0.0.8000
-    command: uwsgi /usr/src/django-memes/uwsgi.ini
+    command: uwsgi --ini /usr/src/django-memes/uwsgi.ini
     volumes: 
       - .:/data 
     ports: 
       - 8000:8000
+    tty: true
   
   nginx:
     build: ./nginx
@@ -20,6 +21,7 @@ services:
       - 80:80
     depends_on: 
       - web 
+    tty: true
 
 volumes:
   static_volume:
