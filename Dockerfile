@@ -13,7 +13,6 @@ RUN pip install --upgrade pip
 RUN pip install pipenv
 COPY Pipfile Pipfile.lock /code/
 RUN pipenv install --skip-lock --system --dev
-#RUN pipenv shell
 
 # copy entrypoint.sh
 COPY ./entrypoint.sh /code/entrypoint.sh

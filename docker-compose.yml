@@ -4,7 +4,6 @@ services:
   web:
     build: .
     command: gunicorn django-memes.wsgi:application --bind 0.0.0.0:8000
-    # command: uwsgi --ini /code/uwsgi.ini
     volumes: 
       - .:/data 
     ports: 
