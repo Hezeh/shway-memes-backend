@@ -1,53 +1,33 @@
 from django.db import models
 import uuid
 from users.models import User
+from versatileimagefield.fields import VersatileImageField, PPOIField
+from django.dispatch import receiver
+from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
-class BaseModel(models.Model):
-    """Base model for the application. Uses UUID for pk."""
-    id = models.UUIDField(
-        primary_key=True,
-        editable=False,
-        default=uuid.uuid4,
-    )
 
-    class Meta:
-        """Metadata."""
-        abstract = True
-
-class Profile(BaseModel):
-    """
-    Every user will have one and only one related Profile model.
-    """
+class Profile(models.Model):
+    id = models.UUIDField(primary_key=True, editable=False,default=uuid.uuid4,)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    """
-    Each user will have a field where they can tell other users
-    something about themselves. This field will be empty when the user 
-    creates their account, so we specify `blank=True`
-    """
     bio = models.TextField(blank=True)
-    """
-    Each user may have an avatar. It is not required
-    """
-    image = models.URLField(blank=True)   # I prefer an ImageField. Will come back to it.
-    """
-    Follows is a Many-To-Many relationship where both sided of the 
-    relationship are of the same model. In this case, the model is
-    Profile. This relationship will be one-way. Just because you're
-    following me doesn't mean I am following you. `symmetrical=False`
-    does this for us
-    """
-    follows = models.ManyToManyField(
-        'self',
-        related_name='followed_by',
-        symmetrical=False,
-        blank=True
-    )
+    headshot = VersatileImageField(
+        'Headshot',
+        upload_to='headshots/',
+        ppoi_field='headshot_ppoi'
+    ) 
+    headshot_ppoi = PPOIField()
+    follows = models.ManyToManyField('self', related_name='followed_by', symmetrical=False, blank=True)
 
     favorites = models.ManyToManyField(
-        'photos.Meme',
+        'uploads.Image',
         related_name='favorited_by',
         blank=True
     )
+    verified = models.BooleanField(default=False, null=True)
+
+    class Meta:
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
 
     def __str__(self):
         return self.user.username
@@ -74,3 +54,14 @@ class Profile(BaseModel):
     def has_favorited(self, meme):
         "Returns True if we have favorited meme; else False"
         return self.favorites.filter(pk=meme.pk).exists()
+
+
+@receiver(models.signals.post_save, sender=Profile)
+def warm_Person_headshot_images(sender, instance, **kwargs):
+    """Ensures Profile head shots are created post-save"""
+    person_img_warmer = VersatileImageFieldWarmer(
+        instance_or_queryset=instance,
+        rendition_key_set='person_headshot',
+        image_attr='headshot'
+    )
+    num_created, failed_to_create = person_img_warmer.warm()

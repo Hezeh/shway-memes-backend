@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from .models import Profile
 
@@ -6,12 +7,12 @@ from .models import Profile
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     bio = serializers.CharField(allow_blank=True, required=False)
-    image = serializers.SerializerMethodField()
+    image = VersatileImageFieldSerializer(sizes='person_headshot')
     following = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
-        fields = ('username', 'bio', 'image', 'following',)
+        fields = ('username', 'bio', 'image', 'following', 'verified')
         read_only_fields = ('username',)
 
     def get_image(self, obj):
