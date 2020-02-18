@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     # 'django_elasticsearch_dsl_drf',
     'drf_yasg',
     'versatileimagefield',
-    'silk',
+    
     
     # Local apps
     'users',
@@ -56,7 +56,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'silk.middleware.SilkyMiddleware',
     # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 

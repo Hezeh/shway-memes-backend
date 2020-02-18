@@ -36,7 +36,7 @@ urlpatterns = [
     path('api/v1/', include('uploads.urls')),
     path('api/v1/', include('profiles.urls')),
     path('api/v1/', include('groups.urls')),
-    path('silk/', include('silk.urls'), name='silk'),
+    # path('silk/', include('silk.urls'), name='silk'),
 ]
 
 if settings.DEBUG:

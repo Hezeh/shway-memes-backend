@@ -20,11 +20,13 @@ INTERNAL_IPS = [
 
 INSTALLED_APPS += [
     'debug_toolbar',
+    # 'silk',
     # 'elastic_panel',
 ]
 
 MIDDLEWARE += [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'silk.middleware.SilkyMiddleware',
     # 'debug_toolbar_force.middleware.ForceDebugToolbarMiddleware',
 ]
 
