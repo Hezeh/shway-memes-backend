@@ -7,7 +7,6 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from rest_framework_jwt.views import refresh_jwt_token
 
 API_TITLE = 'Shwaymemes API'
 API_DESCRIPTION = 'A Web API for shwaymemes backend'
@@ -25,19 +24,19 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('boobs/', admin.site.urls),
+    path('rubicon/', admin.site.urls),
     # path('api-auth/', include('rest_framework.urls')),
     path('api/v1/rest-auth/', include('rest_auth.urls')),
-    path('api/v1/', include('users.urls')),
     # path('api/v1/search/', include('search.urls')),
+    path('api/v1/users', include('users.urls')),
     path('api/v1/rest-auth/registration/', include('rest_auth.registration.urls')),
     path('docs/', include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/v1/', include('uploads.urls')),
     path('api/v1/', include('profiles.urls')),
-    path('refresh-token/', refresh_jwt_token),
     path('api/v1/', include('groups.urls')),
+    path('silk/', include('silk.urls'), name='silk'),
 ]
 
 if settings.DEBUG:

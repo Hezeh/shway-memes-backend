@@ -1,25 +1,17 @@
 from rest_framework import serializers
 from versatileimagefield.serializers import VersatileImageFieldSerializer
-
 from .models import Profile
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     bio = serializers.CharField(allow_blank=True, required=False)
-    image = VersatileImageFieldSerializer(sizes='person_headshot')
+    profile_pic = serializers.ImageField()
     following = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
-        fields = ('username', 'bio', 'image', 'following', 'verified')
-        read_only_fields = ('username',)
-
-    def get_image(self, obj):
-        if obj.image:
-            return obj.image
-
-        return 'https://static.productionready.io/images/smiley-cyrus.jpg'
+        fields = ('id', 'username', 'bio', 'profile_pic', 'following', 'verified', 'is_trending')
 
     def get_following(self, instance):
         request = self.context.get('request', None)

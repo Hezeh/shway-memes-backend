@@ -1,13 +1,31 @@
-from rest_framework import serializers, status
+from rest_framework import serializers, status, viewsets, permissions
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import RetrieveAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from .models import Profile
-# from .renderers import ProfileJSONRenderer
 from .serializers import ProfileSerializer
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+    def update(self, request, *args, **kwargs):
+
+        serializer_data = {
+            'bio': request.data.get('bio'),
+            'profile_pic': request.data.get('profile_pic')
+        }
+
+        serializer = self.serializer_class(
+            request.profile, data=serializer_data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ProfileRetrieveAPIView(RetrieveAPIView):
@@ -33,7 +51,6 @@ class ProfileRetrieveAPIView(RetrieveAPIView):
 
 class ProfileFollowAPIView(APIView):
     permission_classes = (IsAuthenticated,)
-    # renderer_classes = (ProfileJSONRenderer,)
     serializer_class = ProfileSerializer
 
     def delete(self, request, username=None):
@@ -70,3 +87,10 @@ class ProfileFollowAPIView(APIView):
         })
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class TrendingProfiles(ListAPIView):
+    serializer_class = ProfileSerializer
+
+    def get_queryset(self):
+        return Profile.objects.filter(is_trending=True)

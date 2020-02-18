@@ -26,13 +26,15 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'rest_auth',
     'rest_auth.registration',
+    'rest_framework.authtoken',
     'corsheaders',
     'django_filters',
     # 'django_elasticsearch_dsl',
     # 'django_elasticsearch_dsl_drf',
     'drf_yasg',
     'versatileimagefield',
-
+    'silk',
+    
     # Local apps
     'users',
     'uploads',
@@ -45,7 +47,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 SITE_ID = 1
 
 MIDDLEWARE = [
-    'django.middleware.cache.UpdateCacheMiddleware',
+    # 'django.middleware.cache.UpdateCacheMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -54,7 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+    'silk.middleware.SilkyMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -102,7 +105,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Nairobi'
 
 USE_I18N = True
 
@@ -116,19 +119,14 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-       'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
        'rest_framework.authentication.SessionAuthentication',
-    #    'rest_framework.authentication.TokenAuthentication',
+       'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'DEFAULT_PAGINATION_CLASS':
-        'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
+    'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
     'ORDERING_PARAM': 'ordering',
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
-    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
@@ -139,7 +137,11 @@ REST_FRAMEWORK = {
     }
 }
 
-REST_USE_JWT = True 
+
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
+    'TOKEN_SERIALIZER': 'users.serializers.TokenSerializer'
+}
 
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
@@ -156,10 +158,7 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USER_EMAIL_FIELD = 'email'
 ACCOUNT_LOGOUT_ON_GET = True
 AUTH_USER_MODEL = 'users.User'
-
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-
-# ACCOUNT_ADAPTER = 'users.adapters.CustomUserAccountAdapter'
 
 SWAGGER_SETTTINGS = {
     'DEFAULT_GENERATOR_CLASS': 'drf_yasg.generators.OpenAPISchemaGenerator',
@@ -256,17 +255,24 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
     # 'headshot': [
     #     ('headshot_small', 'crop__150x175'),
     # ],
-    'person_headshot': [
-        ('full_size', 'url'),
-        ('thumbnail', 'thumbnail__100x100'),
-        ('medium_square_crop', 'crop__400x400'),
-        ('small_square_crop', 'crop__50x50')
-    ],
+    # 'person_headshot': [
+    #     ('full_size', 'url'),
+    #     ('thumbnail', 'thumbnail__100x100'),
+    #     ('medium_square_crop', 'crop__400x400'),
+    #     ('small_square_crop', 'crop__50x50')
+    # ],
     'meme_shot': [
         ('full_size', 'url'),
         ('thumbnail', 'thumbnail__400x400'),
-        ('medium_square_crop', 'crop__500x400'),
-        ('small_square_crop', 'crop__50x50')
+        ('small_thumbnail', 'thumbnail__200x200'),
+        # ('medium_square_crop', 'crop__500x400'),
+        # ('small_square_crop', 'crop__50x50')
     ]
 }
 
+SILKY_AUTHENTICATION = True  # User must login
+SILKY_AUTHORISATION = True  # User must have permissions
+
+SILKY_PYTHON_PROFILER = True
+SILKY_PYTHON_PROFILER_BINARY = True
+SILKY_META = True
