@@ -1,4 +1,9 @@
-from .views import ProfileFollowAPIView, ProfileViewSet, TrendingProfiles, ProfileRetrieveAPIView
+from .views import (
+    ProfileFollowAPIView,
+     ProfileViewSet, 
+     TrendingProfiles,
+      ProfileRetrieveAPIView
+)
 from django.urls import path
 from rest_framework import routers
 

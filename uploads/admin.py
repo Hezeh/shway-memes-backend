@@ -6,8 +6,8 @@ from .models import Image
 class ImageAdmin(admin.ModelAdmin):
     """Image admin"""
 
-    list_display = ('id', 'publication_date', 'publisher')
-    search_fields = ('publication_date', 'publisher',)
+    list_display = ('id', 'created', 'author')
+    search_fields = ('created', 'author',)
     # filter_horizontal = ('tags',)
     list_per_page = 25
 

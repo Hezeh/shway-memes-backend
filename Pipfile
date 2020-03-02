@@ -14,7 +14,6 @@ django-storages = {extras = ["google"],version = "*"}
 psycopg2-binary = "*"
 gunicorn = "*"
 pillow = "*"
-geoip2 = "*"
 django-rest-auth = "*"
 django-allauth = "*"
 coreapi = "*"
@@ -22,8 +21,9 @@ pyyaml = "*"
 django-filter = "*"
 django-debug-toolbar = "*"
 drf-yasg = {extras = ["validation"],version = "*"}
-django-versatileimagefield = "*"
 django-silk = "*"
+django-elasticsearch-debug-toolbar = "*"
+django-elasticsearch-dsl-drf = "*"
 
 [requires]
 python_version = "3.7"

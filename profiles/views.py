@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Profile
 from .serializers import ProfileSerializer
+import uuid
 
 class ProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -31,12 +32,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class ProfileRetrieveAPIView(RetrieveAPIView):
     permission_classes = (AllowAny,)
     queryset = Profile.objects.select_related('user')
-    # renderer_classes = (ProfileJSONRenderer,)
     serializer_class = ProfileSerializer
 
     def retrieve(self, request, username, *args, **kwargs):
-        # Try to retrieve the requested profile and throw an exception if the
-        # profile could not be found.
         try:
             profile = self.queryset.get(user__username=username)
         except Profile.DoesNotExist:
@@ -53,13 +51,16 @@ class ProfileFollowAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ProfileSerializer
 
-    def delete(self, request, username=None):
+    def delete(self, request, username):
         follower = self.request.user.profile
 
         try:
             followee = Profile.objects.get(user__username=username)
         except Profile.DoesNotExist:
             raise NotFound('A profile with this username was not found.')
+
+        if (followee.pk == follower.pk):
+            raise serializers.ValidationError('You cannot follow yourself.')
 
         follower.unfollow(followee)
 
@@ -69,7 +70,7 @@ class ProfileFollowAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, username=None):
+    def post(self, request, username):
         follower = self.request.user.profile
 
         try:
@@ -77,8 +78,8 @@ class ProfileFollowAPIView(APIView):
         except Profile.DoesNotExist:
             raise NotFound('A profile with this username was not found.')
 
-        if follower.pk is followee.pk:
-            raise serializers.ValidationError('You can not follow yourself.')
+        if (followee.pk == follower.pk):
+            raise serializers.ValidationError('You cannot follow yourself.')
 
         follower.follow(followee)
 
@@ -87,7 +88,6 @@ class ProfileFollowAPIView(APIView):
         })
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 class TrendingProfiles(ListAPIView):
     serializer_class = ProfileSerializer

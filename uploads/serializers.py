@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from versatileimagefield.serializers import VersatileImageFieldSerializer
 from .models import Image
 from profiles.serializers import ProfileSerializer
 
@@ -18,37 +17,39 @@ from profiles.serializers import ProfileSerializer
 #         return value.title
 
 
+class StringSerializer(serializers.StringRelatedField):
+    def to_internal_value(self, value):
+        return value
+
+
 class ImageSerializer(serializers.ModelSerializer):
-    # author = ProfileSerializer(read_only=True)
-    publisher_name = serializers.SerializerMethodField(method_name='get_username')
+    # author = StringSerializer(many=False)
     favorited = serializers.SerializerMethodField(method_name='get_favorited')
-    # favoritesCount = serializers.SerializerMethodField(method_name='get_favorites_count')
+    photo = serializers.ImageField()
+    favoritesCount = serializers.SerializerMethodField(method_name='get_favorites_count')
+    reposted = serializers.SerializerMethodField(method_name='get_reposted')
+    repostsCount = serializers.SerializerMethodField(method_name='get_reposts_count')
     # tagsList = TagRelatedField(many=True, required=False, source='tags')
-    photo = VersatileImageFieldSerializer(
-        sizes='meme_shot'
-    )
-
-    # following = serializers.SerializerMethodField(method_name='get_following')
-    # verified = serializers.SerializerMethodField(method_name='get_verified')
-    # trending = serializers.SerializerMethodField(method_name='get_trending')
-
+    following = serializers.SerializerMethodField(method_name='get_following')
+    trending = serializers.SerializerMethodField(method_name='get_trending')
+    author_name = serializers.SerializerMethodField(method_name='get_author')
 
     class Meta:
         model = Image
         fields = (
             'id',
-            'publisher_name',
-            # 'favoritesCount',
+            'favoritesCount',
             'favorited',
             'photo',
-            'publication_date',
-            # 'caption',
+            'author',
+            'following',
+            'trending',
+            'created',
+            'caption',
+            'author_name',
+            'reposted',
+            'repostsCount',
             # 'tagsList',
-            # 'author',
-            'publisher',
-            # 'following',
-            # 'verified',
-            # 'trending',
         )
 
     def create(self, validated_data):
@@ -65,41 +66,53 @@ class ImageSerializer(serializers.ModelSerializer):
         request = self.context.get('request', None)
 
         if request is None:
-            return False 
+            return False
+
+        if not request.user.is_authenticated:
+            return False
+
+        return request.user.profile.has_favorited(instance)
+
+
+    def get_favorites_count(self, instance):
+        return instance.favorited_by.count()
+
+    def get_reposted(self, instance):
+        request = self.context.get('request', None)
+
+        if request is None:
+            return False
 
         if not request.user.is_authenticated:
             return False 
 
-        return request.user.profile.has_favorited(instance)
+        return request.user.profile.has_reposted(instance)
 
-    # def get_favorites_count(self, instance):
-    #     return instance.favorited_by.count()
+    def get_reposts_count(self, instance):
+        return instance.reposted_by.count()
 
-    def get_username(self, instance):
-        return instance.publisher.username
+    def get_following(self, instance):
+        request = self.context.get('request', None)
 
-    # def get_profile_username(self, instance):
-    #     return instance.author.user.username
+        if request is None:
+            return False
 
-    # def get_following(self, instance):
-    #     request = self.context.get('request', None)
+        if not request.user.is_authenticated:
+            return False
 
-    #     if request is None:
-    #         return False 
+        follower = request.user.profile
+        followee = instance.author.user.profile
 
-    #     if not request.user.is_authenticated:
-    #         return False 
+        if (follower.pk == followee.pk):
+            return None
 
-    #     return request.user.profile.is_following(instance)
+        return follower.is_following(followee)
 
-    # def get_following_count(self, instance):
-    #     return instance.is_following.count()
+    def get_trending(self, instance):
+        return instance.author.is_trending
 
-    # def get_verified(self, instance):
-    #     return instance.author.verified
-
-    # def get_trending(self, instance):
-    #     return instance.author.is_trending
+    def get_author(self, instance):
+        return instance.author.user.username
 
 # class TagSerializer(serializers.ModelSerializer):
 #     class Meta:

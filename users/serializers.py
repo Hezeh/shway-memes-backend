@@ -32,12 +32,23 @@ class CustomRegisterSerializer(RegisterSerializer):
         adapter.save_user(request, user, self)
         return user
 
+class StringSerializer(serializers.StringRelatedField):
+
+    def to_internal_value(self, value):
+        return value
+
 
 class TokenSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField(method_name='get_author')
+    user = StringSerializer()
 
     class Meta:
         model = Token
         # fields = ('key', 'user', )
         fields = '__all__'
+
+    def get_author(self, request):
+        request = self.context.get('request', None)
+        return request.user.profile.id
 
 

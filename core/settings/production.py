@@ -28,7 +28,6 @@ else:
 
 ALLOWED_HOSTS = ["127.0.0.1", 'api.shwaymemes.com'] + HOSTS
 # SECURITY WARNING: update this when you have the production host
-# ALLOWED_HOSTS = ['api.shwaymemes.com'] + HOSTS
 
 DATABASES = {"default": env.db()}
 
@@ -65,29 +64,19 @@ else:
     MEDIA_URL = "/media/"  # what is prepended to the image URL (in this case)
 
 # Elasticsearch configuration
-# ELASTICSEARCH_DSL = {
-#     'default': {
-#         'hosts': 'localhost:9200',
-#         'timeout': 30,
-#     },
-# }
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'localhost:9200',
+        'timeout': 30,
+    },
+}
 
-# # Google Cloud Storage configuration
-# GS_PROJECT_ID = os.environ.get("GS_PROJECT_ID")
-# GS_STORAGE_BUCKET_NAME = os.environ.get("GS_STORAGE_BUCKET_NAME")
-# GS_MEDIA_BUCKET_NAME = os.environ.get("GS_MEDIA_BUCKET_NAME")
-# GS_AUTO_CREATE_BUCKET = os.environ.get("GS_AUTO_CREATE_BUCKET")
+# Name of the Elasticsearch index
+ELASTICSEARCH_INDEX_NAMES = {
+    'search.documents.profiles': 'prod_profiles',
+    # 'search.documents.groups': 'prod_groups',
+}
 
-# # If GOOGLE_APPLICATION_CREDENTIALS is set there is no need to load OAuth token
-# if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
-#     GS_CREDENTIALS = os.environ.get("GS_CREDENTIALS")
-
-# if GS_STORAGE_BUCKET_NAME:
-#     STATICFILES_STORAGES = "storages.backends.gcloud.GoogleCloudStorage"
-
-# if GS_MEDIA_BUCKET_NAME:
-#     DEFUALT_FILE_STORAGE = "django-memes.core.storages.GCSMediaStorage"
-#     THUMBNAIL_DEFAULT_STORAGE = DEFAULT_FILE_STORAGE
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_SSL_REDIRECT = True
@@ -137,10 +126,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 #     # read os.environ['REDIS_URL']
 #     'redis': env.cache('REDIS_URL')
 # }
-
-# INTERNAL_IPS = [
-#     '127.0.0.1',
-# ]
 
 # MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 

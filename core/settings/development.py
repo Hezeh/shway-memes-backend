@@ -22,6 +22,8 @@ INSTALLED_APPS += [
     'debug_toolbar',
     # 'silk',
     # 'elastic_panel',
+    # 'django_elasticsearch_dsl',
+    # 'django_elasticsearch_dsl_drf',
 ]
 
 MIDDLEWARE += [
@@ -77,6 +79,25 @@ DEBUG_TOOLBAR_PANELS = [
     # 'elastic_panel.panel.ElasticDebugPanel',
 ]
 
+# Elasticsearch configuration
+# ELASTICSEARCH_DSL = {
+#     'default': {
+#         'hosts': 'localhost:9200',
+#         'timeout': 30,
+#     },
+# }
+
+# # Name of the Elasticsearch index
+# ELASTICSEARCH_INDEX_NAMES = {
+#     'search.documents.profiles': 'dev_profiles',
+#     # 'search.documents.groups': 'dev_groups',
+# }
+
+# # Name of the Elasticsearch inde
+# ELASTICSEARCH_INDEX_NAMES = {
+#     'search.documents.tag': 'dev_tag',
+#     # ... others the same
+# }
 
 # CACHES = {
 #     "default": {
@@ -104,18 +125,4 @@ DEBUG_TOOLBAR_PANELS = [
 #     'uploads.*': {'ops': 'all', 'timeout': 60 * 60},
 #     'groups.*': {'ops': 'all', 'timeout': 60 * 60},
 #     'search.*': {'ops': 'all', 'timeout': 60 * 60},
-# }
-
-# Elasticsearch configuration
-# ELASTICSEARCH_DSL = {
-#     'default': {
-#         'hosts': 'localhost:9200',
-#         'timeout': 30,
-#     },
-# }
-
-# # Name of the Elasticsearch inde
-# ELASTICSEARCH_INDEX_NAMES = {
-#     'search.documents.tag': 'dev_tag',
-#     # ... others the same
 # }

@@ -12,101 +12,28 @@ from users.models import User
 # from django_filters.filters import OrderingFilter, SearchFilter
 # from django_filters.rest_framework import DjangoFilterBackend
 
-class ImageFavoriteAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = ImageSerializer
-
-    def delete(self, request, pk=None):
-        profile = self.request.user.profile
-        serializer_context = {'request': request}
-        try:
-            image = Image.objects.get(pk=pk)
-        except Image.DoesNotExist:
-            raise NotFound('An Image with this id was not found.')
-
-        profile.unfavorite(image)
-
-        serializer = self.serializer_class(image, context=serializer_context)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, pk=None):
-        profile = self.request.user.profile
-        serializer_context = {'request': request}
-
-        try:
-            image = Image.objects.get(pk=pk)
-        except Image.DoesNotExist:
-            raise NotFound('An Image with that id was not found.')
-
-        profile.favorite(image)
-
-        serializer = self.serializer_class(image, context=serializer_context)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-# class TagListAPIView(generics.ListAPIView):
-#     queryset = Tag.objects.all()
-#     pagination_class = None
-#     permission_classes = (AllowAny,)
-#     serializer_class = TagSerializer
-
-#     def list(self, request):
-#         serializer_data = self.get_queryset()
-#         serializer = self.serializer_class(serializer_data, many=True)
-
-#         return Response({
-#             'tags': serializer.data
-#         }, status=status.HTTP_200_OK)
-
-
-class ImageFeedAPIView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
-    queryset = Image.objects.all()
-    serializer_class = ImageSerializer
-
-    def get_queryset(self):
-        return Image.objects.filter(author__in=self.request.user.profile.follows.all()
-               )
-
-    def list(self, request):
-        queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
-
-        serializer_context = {'request': request}
-        serializer = self.serializer_class(
-            page, context=serializer_context, many=True
-        )
-
-        return self.get_paginated_response(serializer.data)
-    
-
 class ImageViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
                    viewsets.GenericViewSet, generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ImageSerializer
     queryset = Image.objects.all()
-    # filter_backends = [filters.OrderingFilter]
-    # ordering_fields = ('publication_date', )
-    # ordering = ('-publication_date', )
 
     def get_queryset(self):
         queryset = self.queryset
 
-        publisher = self.request.query_params.get('publisher', None)
-        if publisher is not None:
-            queryset = queryset.filter(publisher__username=publisher)
+        author = self.request.query_params.get('author', None)
+        if author is not None:
+            queryset = queryset.filter(author__user__username=author)
         return queryset
 
         # tag = self.request.query_params.get('tag', None)
         # if tag is not None:
         #     queryset = queryset.filter(tags__tag=tag)
 
-        favorited_by = self.request.query_params.get('favorited', None)
-        if favorited_by is not None:
-            queryset = queryset.filter(favorited_by__author__user=favorited_by)
-        return queryset
+        # favorited_by = self.request.query_params.get('favorited', None)
+        # if favorited_by is not None:
+        #     queryset = Image.objects.filter(favorited_by__user__username=favorited_by)
+        # return queryset
 
     def list(self, request):
         serializer_context = {'request': request}
@@ -157,15 +84,139 @@ class ImageViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class ImageRepostAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ImageSerializer
+
+    def delete(self, request, pk=None):
+        profile = self.request.user.profile
+        serializer_context = {'request': request}
+        try:
+            image = Image.objects.get(pk=pk)
+        except Image.DoesNotExist:
+            raise NotFound('An image with that id was not found')
+
+        profile.unrepost(image)
+
+        serializer = self.serializer_class(image, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk=None):
+        profile= self.request.user.profile
+        serializer_context = {'request': request}
+
+        try:
+            image = Image.objects.get(pk=pk)
+        except Image.DoesNotExist:
+            raise NotFound('An image with that id was not found')
+
+        profile.repost(image)
+
+        serializer = self.serializer_class(image, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ImageFavoriteAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ImageSerializer
+
+    def delete(self, request, pk=None):
+        profile = self.request.user.profile
+        serializer_context = {'request': request}
+        try:
+            image = Image.objects.get(pk=pk)
+        except Image.DoesNotExist:
+            raise NotFound('An Image with this id was not found.')
+
+        profile.unfavorite(image)
+
+        serializer = self.serializer_class(image, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk=None):
+        profile = self.request.user.profile
+        serializer_context = {'request': request}
+
+        try:
+            image = Image.objects.get(pk=pk)
+        except Image.DoesNotExist:
+            raise NotFound('An Image with that id was not found.')
+
+        profile.favorite(image)
+
+        serializer = self.serializer_class(image, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ImageFeedAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
+
+    def get_queryset(self):
+        return Image.objects.filter(author__in=self.request.user.profile.follows.all()
+               )
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        serializer_context = {'request': request}
+        serializer = self.serializer_class(
+            page, context=serializer_context, many=True
+        )
+
+        return self.get_paginated_response(serializer.data)
+    
+
 class UserUploads(generics.ListAPIView):
     serializer_class = ImageSerializer
 
     def get_queryset(self):
-        user = self.request.user 
-        return Image.objects.filter(publisher=user)
+        user = self.request.user.profile
+        return Image.objects.filter(author=user)
+
+
+class UserFavorites(generics.ListAPIView):
+    serializer_class = ImageSerializer
+
+    def get_queryset(self):
+        favorited_by = self.request.query_params.get('favorited', None)
+        queryset = Image.objects.filter(favorited_by__user__username=favorited_by)
+        return queryset
+
+
+class UserReposts(generics.ListAPIView):
+    serializer_class = ImageSerializer
+
+    def get_queryset(self):
+        reposted_by = self.request.query_params.get('reposted', None)
+        queryset = Image.objects.filter(reposted_by__user__username=reposted_by)
+        return queryset
+
+
 
 # class TrendingHashtags(generics.ListAPIView):
 #     serializer_class = TagSerializer
 
 #     def get_queryset(self):
 #         return Tag.objects.filter(trending=True)
+
+
+# class TagListAPIView(generics.ListAPIView):
+#     queryset = Tag.objects.all()
+#     pagination_class = None
+#     permission_classes = (AllowAny,)
+#     serializer_class = TagSerializer
+
+#     def list(self, request):
+#         serializer_data = self.get_queryset()
+#         serializer = self.serializer_class(serializer_data, many=True)
+
+#         return Response({
+#             'tags': serializer.data
+#         }, status=status.HTTP_200_OK)

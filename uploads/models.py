@@ -1,12 +1,10 @@
 from django.db import models
 from django.db.models import signals, F
-from versatileimagefield.fields import PPOIField, VersatileImageField
 import uuid
 from django.db import models
 from users.models import User
-from versatileimagefield.fields import VersatileImageField, PPOIField
-from versatileimagefield.image_warmer import VersatileImageFieldWarmer
-from django.dispatch import receiver
+from profiles.models import Profile
+
 
 # class Tag(models.Model):
 #     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4,)
@@ -27,22 +25,14 @@ from django.dispatch import receiver
 #     def __str__(self):
 #         return self.title
 
+
 class Image(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4,)
-    publisher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='images')
-    photo = VersatileImageField(
-        'Upload',
-        upload_to='uploads/',
-        ppoi_field='photo_ppoi',
-        blank=False,
-    )
-    photo_ppoi = PPOIField()
-    publication_date = models.DateTimeField(auto_now_add=True)
-    # caption = models.CharField(max_length=255, blank=True)
+    photo = models.ImageField(upload_to='uploads/', blank=False, default=None)
+    created = models.DateTimeField(auto_now_add=True)
+    caption = models.CharField(max_length=255, blank=True)
     # tags = models.ManyToManyField('uploads.Tag', related_name='images', blank=True)
-    # author = models.ForeignKey(
-    #     'profiles.Profile', on_delete=models.CASCADE, related_name='images', default=None
-    # )
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='images', default=None)
 
     def __str__(self):
         return str(self.id)
@@ -50,7 +40,7 @@ class Image(models.Model):
     class Meta(object):
         verbose_name = 'Image'
         verbose_name_plural = 'images'
-        ordering = ['-publication_date']
+        ordering = ['-created']
 
     # @property
     # def print_self(self):
@@ -102,14 +92,3 @@ class Image(models.Model):
     #     for user in self.parse_mentions():
     #         targets.append(feed_manager.get_news_feeds(user.id)['timeline'])
     #     return targets
-
-
-@receiver(signals.post_save, sender=Image)
-def warm_images(sender, instance, **kwargs):
-    "Ensures images are created post-save"
-    img_warmer = VersatileImageFieldWarmer(
-        instance_or_queryset=instance,
-        rendition_key_set='meme_shot',
-        image_attr='photo',
-    )
-    num_created, failed_to_create = img_warmer.warm()
