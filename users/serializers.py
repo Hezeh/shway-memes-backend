@@ -39,16 +39,12 @@ class StringSerializer(serializers.StringRelatedField):
 
 
 class TokenSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField(method_name='get_author')
+    author = serializers.CharField(source='user.profile.id')
     user = StringSerializer()
 
     class Meta:
         model = Token
         # fields = ('key', 'user', )
         fields = '__all__'
-
-    def get_author(self, request):
-        request = self.context.get('request', None)
-        return request.user.profile.id
 
 
