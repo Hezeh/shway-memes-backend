@@ -11,10 +11,11 @@ from django_filters import rest_framework as filters
 from rest_framework.views import APIView
 from uploads.serializers import ImageSerializer
 from rest_framework.exceptions import NotFound
-
+from pagination.custom import CustomPagination
 
 class CurrentUserGroupList(generics.ListAPIView):
     serializer_class = GroupSerializer
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         """
@@ -29,6 +30,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = GroupSerializer
     queryset = Group.objects.all()
+    pagination_class = CustomPagination
 
 
 class GroupPostViewSet(viewsets.ModelViewSet):
@@ -52,6 +54,7 @@ class GroupPostViewSet(viewsets.ModelViewSet):
 class TrendingGroups(generics.ListAPIView):
     serializer_class = GroupSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         return Group.objects.filter(is_trending=True)
@@ -61,12 +64,13 @@ class GroupMembers(generics.ListAPIView):
     serializer_class = GroupMembers
     permission_classes = (IsAuthenticated, )
     queryset = Group.objects.all()
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         queryset = self.queryset
         group_id = self.request.query_params.get('id', None)
         if group_id is not None:
-            queryset = queryset.filter(group__id=group_id)
+            queryset = queryset.filter(id=group_id)
         return queryset
 
 

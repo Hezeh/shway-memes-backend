@@ -4,7 +4,7 @@ from .models import Group, GroupPost
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'created', 'is_public', 'is_trending',)
-    search_fields = ('created', 'name', 'group_members')
+    search_fields = ('created', 'name', 'members')
     list_per_page = 10
     filter_horizontal = ('members',)
     list_editable = ('is_public', 'is_trending',)

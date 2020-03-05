@@ -7,11 +7,15 @@ class Group(models.Model):
     name = models.CharField(blank=False, max_length=100, unique=True, default=None)
     members = models.ManyToManyField(User, blank=True)
     created = models.DateTimeField(auto_now_add=True)
+    # admin = models.ForeignKey(User, blank=False, related_name='is_admin', on_delete=models.CASCADE, default=None)
     is_public = models.BooleanField(default=True)
     is_trending = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
+
+    # def is_admin(self, admin):
+    #     return self.reposts.filter(pk=admin.pk).exists()
 
     # def get_member_list(self):
     #     "Returns a list with members, without admin information"

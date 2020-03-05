@@ -22,5 +22,5 @@ urlpatterns = [
     path('groups/', include(router.urls)),
     path('trending-groups', TrendingGroups.as_view()),
     path('groups/members', GroupMembers.as_view()),
-     path('groups/<pk>/join', GroupJoinAPIView.as_view()),
+    path('groups/<pk>/join', GroupJoinAPIView.as_view()),
 ]

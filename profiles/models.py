@@ -49,6 +49,9 @@ class Profile(models.Model):
         "Disjoin group if we're already members; False otherwise"
         self.groups.remove(group)
 
+    # def is_admin(self, group):
+    #     self.groups.filter(pk=group.pk).exists()
+
     def has_joined(self, group):
         "Returns True if we have joined group; else False"
         return self.groups.filter(pk=group.pk).exists()

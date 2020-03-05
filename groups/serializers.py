@@ -10,7 +10,6 @@ class StringSerializer(serializers.StringRelatedField):
 class GroupSerializer(serializers.ModelSerializer):
     membersCount = serializers.SerializerMethodField(method_name='get_members_count')
     member = serializers.SerializerMethodField(method_name='get_membership')
-    # members = StringSerializer(many=True)
 
     class Meta:
         model = Group
@@ -22,7 +21,7 @@ class GroupSerializer(serializers.ModelSerializer):
             'is_public',
             'is_trending',
             'membersCount',
-            # 'members',
+            # 'admin',
         )
 
     def get_members_count(self, instance):
@@ -32,7 +31,7 @@ class GroupSerializer(serializers.ModelSerializer):
         request = self.context.get('request', None)
 
         if request is None:
-            return False 
+            return False
 
         if not request.user.is_authenticated:
             return False

@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from .models import Profile
 from .serializers import ProfileSerializer
 import uuid
+from pagination.custom import CustomPagination
 
 class ProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -91,6 +92,7 @@ class ProfileFollowAPIView(APIView):
 
 class TrendingProfiles(ListAPIView):
     serializer_class = ProfileSerializer
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         return Profile.objects.filter(is_trending=True)
