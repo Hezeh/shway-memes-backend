@@ -22,8 +22,9 @@ class CurrentUserGroupList(generics.ListAPIView):
         This view should return a list of all the groups
         for the currently authenticated user.
         """
-        user = self.request.user
-        return Group.objects.filter(members=user)
+        username = self.request.query_params.get('member', None)
+        queryset = Group.objects.filter(joined_by__user__username=username)
+        return queryset
 
 
 class GroupViewSet(viewsets.ModelViewSet):

@@ -96,3 +96,12 @@ class TrendingProfiles(ListAPIView):
 
     def get_queryset(self):
         return Profile.objects.filter(is_trending=True)
+
+
+# class ProfileFollowers(ListAPIView):
+#     serializer_class = ProfileSerializer
+#     pagination_class = CustomPagination
+
+#     def get_queryset(self):
+#         # followed_by = self.request.query_params('profile', None)
+#         return Profile.objects.filter(is_followed_by=True)
